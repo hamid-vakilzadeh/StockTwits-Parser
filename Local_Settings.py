@@ -3,5 +3,6 @@
 # %% changes the following variables as necessary
 
 
-address_original_messages = "/Volumes/Main/Databases/StockTwits/Messages/"
-address_original_messages = "/Volumes/Main/Databases/StockTwits/Activity/"
+Messages_Folder = "/Volumes/Main/Databases/StockTwits/Messages/"
+Activity_Folder = "/Volumes/Main/Databases/StockTwits/Activity/"
+Legacy_Folder = "/Volumes/Main/Databases/StockTwits/Legacy"

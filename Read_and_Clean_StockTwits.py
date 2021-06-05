@@ -11,7 +11,7 @@ You need to provide
 
 
 
-@author: hamid
+@author: Hamid Vakilzadeh
 """
 
 # %% importing libraries
@@ -27,11 +27,13 @@ from textblob import TextBlob
 import csv
 import shutil
 import time
-
-
+import numpy as np
+from Local_Settings import Activity_Folder, Legacy_Folder, Messages_Folder
+from argparse import ArgumentParser
 # import html
 
 # %% input data 
+
 
 # address = input("Please enter the address where the StockTwits Messages are located on your computer:\n")
 address = "/Volumes/Main/Databases/StockTwits/Messages/"
@@ -365,3 +367,10 @@ try:
 
 except:
     print("process interrupted")
+
+with gopen(os.path.join(address, files_to_analyze[0]), 'rt') as f:
+    Activity = [jload(line) for line in f]
+f.close()
+message_pd = pd.json_normalize(Activity,max_level=5)
+message_pd['data.symbols'].replace(np.nan, '', regex=True, inplace=True)
+message_pd[["id", "symbol", "title", "exchange", "sector", "industry"]] = pd.DataFrame(message_pd["data.symbols"].tolist(), index=message_pd.index)
