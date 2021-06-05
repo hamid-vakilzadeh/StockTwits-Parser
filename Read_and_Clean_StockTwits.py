@@ -28,11 +28,22 @@ import csv
 import shutil
 import time
 import numpy as np
-from Local_Settings import Activity_Folder, Legacy_Folder, Messages_Folder
+
+import Local_Settings
+from Local_Settings import ST_Folder
+
 from argparse import ArgumentParser
+from pathlib import Path
 # import html
 
 # %% input data 
+class Files:
+
+    def __init__(self, foldername: str):
+        self.FilesList = list(Path(foldername).glob('**/*.gz'))
+        self.MessageFiles = list(Path(self).glob("**/stocktwits_messages_*.gz"))
+        self.ActivityFiles = list(Path(self).glob("**/stocktwits_activity_*.gz"))
+        self.LegacyFiles = list(Path(self).glob("**/stocktwits_activity_*.gz"))
 
 
 # address = input("Please enter the address where the StockTwits Messages are located on your computer:\n")
