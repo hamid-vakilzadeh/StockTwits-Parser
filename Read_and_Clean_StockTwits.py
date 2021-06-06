@@ -30,41 +30,23 @@ import time
 import numpy as np
 
 import Local_Settings
-from Local_Settings import ST_Folder
+from Local_Settings import Messages_Folder, Activity_Folder, Legacy_Folder
 
 from argparse import ArgumentParser
 from pathlib import Path
 # import html
 
-# %% input data 
+
+# Class for Handling StockTwits Files
 class Files:
+    Category = {1: 'stocktwits_activity',
+                2: 'stocktwits_messages',
+                3: 'stocktwits_legacy_messages'}
 
-    def __init__(self, foldername: str):
-        self.FilesList = list(Path(foldername).glob('**/*.gz'))
-        self.MessageFiles = list(Path(self).glob("**/stocktwits_messages_*.gz"))
-        self.ActivityFiles = list(Path(self).glob("**/stocktwits_activity_*.gz"))
-        self.LegacyFiles = list(Path(self).glob("**/stocktwits_activity_*.gz"))
-
-
-# address = input("Please enter the address where the StockTwits Messages are located on your computer:\n")
-address = "/Volumes/Main/Databases/StockTwits/Messages/"
-
-analysis_year = input("Enter the Year for which you want to extract Tweet Information:\n")
-#
-
-if os.path.exists('Messages') is False:
-    os.mkdir('Messages')
-else:
-    pass
-
-destination = "Messages/"
-
-if os.path.exists("Messages/Temp") is False:
-    os.mkdir("Messages/Temp")
-else:
-    pass
-
-Temp_directory = "Messages/Temp"
+    def __init__(self, folder_name: str, category: int, year: str = '', month: str = ''):
+        regex = rf'{Files.Category[category]}.*{year}.*{month}'
+        self.FilesList = [file for file in Path(folder_name).iterdir() if re.findall(regex, file.name)]
+        self.FilesList.sort()
 
 # %% prepare directory fil
 
