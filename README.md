@@ -1,7 +1,7 @@
 # StockTwits-Reader
 
 ### ** Under Development **
-### The current version is written for a very specific research project. Over the course of next 6 months, I will change this to be a complete package.
+### The current version is written for a very specific research project. I will change this to be a complete package.
 
 StockTwits-Reader structures and standardizes [StockTwits](https://stocktwits.com) Historical Database.
 
