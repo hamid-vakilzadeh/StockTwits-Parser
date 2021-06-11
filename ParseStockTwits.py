@@ -18,7 +18,6 @@ You need to provide
 import gzip
 import json
 import re
-import os
 import pandas as pd
 import datetime
 import unicodedata
@@ -28,12 +27,10 @@ import csv
 import shutil
 import time
 import numpy as np
-
-import Local_Settings
-from Local_Settings import Messages_Folder, Activity_Folder, Legacy_Folder
-
 from argparse import ArgumentParser
 from pathlib import Path
+import Local_Settings
+
 # import html
 
 # accepted arguments
@@ -85,14 +82,13 @@ gopen = gzip.open
 
 files_to_analyze = [i for i in os.listdir(address) if "message" in i and analysis_year in i]
 files_to_analyze.sort()
-lm_dictionary = pd.read_excel("LoughranMcDonald_SentimentWordLists_2018.xlsx", sheet_name = ['Negative','Positive'], header = None)
 
 
 
 # %% open Loughran and McDonald's sentiment dictionary
 
-lm_negative = lm_dictionary.get('Negative')[0].tolist()
-lm_positive = lm_dictionary.get('Positive')[0].tolist()
+lm_negative = Local_Settings.lm_dictionary.get('Negative')[0].tolist()
+lm_positive = Local_Settings.lm_dictionary.get('Positive')[0].tolist()
 
 def loughran_scores(text):
     twords = text.split()
@@ -100,7 +96,7 @@ def loughran_scores(text):
     len_twords2 = len(twords2)
     negative_found = len([i for i in twords2 if i in lm_negative])
     positive_found = len([i for i in twords2 if i in lm_positive])
-    return(negative_found, positive_found, len_twords2)
+    return negative_found, positive_found, len_twords2
 
 
 # %% investigate the content of Twits and Acitivites Json Files
