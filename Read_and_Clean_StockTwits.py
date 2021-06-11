@@ -36,6 +36,36 @@ from argparse import ArgumentParser
 from pathlib import Path
 # import html
 
+# accepted arguments
+parser = ArgumentParser()
+parser.add_argument('-f', '--file', type=str, help='Output file name.')
+parser.add_argument('-c', '--category', type=int, help='1.Activity 2.Messages 3.legacy messages.')
+parser.add_argument('-y', '--year', type=str, default='', help='Analysis year.')
+parser.add_argument('-m', '--year', type=str, default='', help='Analysis month.')
+parser.add_argument('-o', '--overwrite', type=str, help='Pass "a" to append or "w" to overwrite an existing file.')
+args = parser.parse_args()
+
+if not args.file:
+    raise Exception(
+        'Output file name not provided. use -f to specify your file name.')
+
+if not args.category:
+    raise Exception(
+        'Category not selected. Enter a number 1)Activity 2)Messages or 3)legacy messages.')
+
+if not args.overwrite and args.file in os.listdir('Outputs'):
+    raise Exception(
+        (f'{args.file} already exists. use "-o a" to append. use "-o w" to overwrite.')
+    )
+elif not args.overwrite:
+    args.overwrite = 'w'
+
+if not args.end:
+    args.end = args.begin+50000
+
+
+
+
 
 # Class for Handling StockTwits Files
 class Files:
