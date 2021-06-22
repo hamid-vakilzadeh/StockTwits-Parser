@@ -15,8 +15,9 @@ You need to provide
 """
 
 # %% importing libraries
-import gzip
-import json
+from gzip import open as gopen
+from json import loads as jload
+from json import dumps as jdumps
 import re
 import pandas as pd
 import datetime
@@ -30,6 +31,7 @@ import numpy as np
 from argparse import ArgumentParser
 from pathlib import Path
 import Local_Settings
+import os
 
 # import html
 
@@ -48,41 +50,52 @@ if not args.file:
 
 if not args.category:
     raise Exception(
-        'Category not selected. Enter a number 1)Activity 2)Messages or 3)legacy messages.')
+        'Category number not selected. Enter a number 1) Activity 2) Messages or 3) legacy messages.')
 
 if not args.overwrite and args.file in os.listdir('Outputs'):
     raise Exception(
-        (f'{args.file} already exists. use "-o a" to append. use "-o w" to overwrite.')
-    )
+        f'{args.file} already exists. use "-o a" to append. use "-o w" to overwrite.')
+
 elif not args.overwrite:
     args.overwrite = 'w'
 
-if not args.end:
-    args.end = args.begin+50000
 
+def files(folder_name: str, category: int, year: str = '', month: str = ''):
+    """ handling local StockTwits files """
 
-
-
-
-# Class for Handling StockTwits Files
-class Files:
     Category = {1: 'stocktwits_activity',
                 2: 'stocktwits_messages',
                 3: 'stocktwits_legacy_messages'}
 
-    def __init__(self, folder_name: str, category: int, year: str = '', month: str = ''):
-        regex = rf'{Files.Category[category]}.*{year}.*{month}'
-        self.FilesList = [file for file in Path(folder_name).iterdir() if re.findall(regex, file.name)]
-        self.FilesList.sort()
+    regex = rf'{Category[category]}.*{year}.*{month}'
+    FilesList = [file for file in Path(folder_name).iterdir() if re.findall(regex, file.name)]
+    FilesList.sort()
+    if not len(FilesList) == 0:
+        return FilesList
+    else:
+        raise ValueError(f'No Files Found.')
+
+
+
+
+class StockTwits_BackUp:
+
+    def open(self, filename):
+        self.Text = gopen(filename, 'rt').readlines()
+        self.TotalTweets = len(self.Text)
+
+
 
 # %% prepare directory fil
 
-jload = json.loads
-gopen = gzip.open
 
-files_to_analyze = [i for i in os.listdir(address) if "message" in i and analysis_year in i]
-files_to_analyze.sort()
+files_to_analyze = Files(folder_name=Local_Settings.Messages_Folder, category=2, year=2009).FilesList
+test = gopen(files_to_analyze[0], 'rt').readlines()
+test = pd.read_json(files_to_analyze[0], lines=True)
+TweetsDetails = pd.json_normalize(test['data'])
+ReviewsSample = Reviews.join([RatingsDetail,ResponseDetails]).drop(['RatingsDetail', 'ResponseDetails'], axis=1)
 
+new_df = pd.concat([pd.DataFrame(json_normalize(x)) for x in df['json']],ignore_index=True)
 
 
 # %% open Loughran and McDonald's sentiment dictionary
@@ -102,7 +115,7 @@ def loughran_scores(text):
 # %% investigate the content of Twits and Acitivites Json Files
 # Color code the Json file for investigation and viewing the order of a tweet
 '''
-Twits_json_example = (json.dumps(Twits[1], indent=4, sort_keys=True))
+Twits_json_example = (jdumps(Twits[1], indent=4, sort_keys=True))
 
 colorful__Twits_json = highlight(Twits_json_example, lexers.JsonLexer(), formatters.TerminalFormatter())
 print(colorful__Twits_json)
@@ -292,18 +305,18 @@ def tweet_extractor(tweet):
     tb = TextBlob(reduced_length_tweet_text)
     tweet_text_correct = str(tb)
     vader_scores = vsp(tweet_text_correct)
-    tweet_information['vader_neg'] = (vader_scores)['neg']
-    tweet_information['vader_neu'] = (vader_scores)['neu']
-    tweet_information['vader_pos'] = (vader_scores)['pos']
-    tweet_information['vader_compund'] = (vader_scores)['compound']
+    tweet_information['vader_neg'] = vader_scores['neg']
+    tweet_information['vader_neu'] = vader_scores['neu']
+    tweet_information['vader_pos'] = vader_scores['pos']
+    tweet_information['vader_compund'] = vader_scores['compound']
 
     # These VADER scores are generated based on the cleaned text of the tweet (normalized)
     clean_tweet_text = normalize_text(tweet_text)
     vader_scores_clean = vsp(clean_tweet_text)
-    tweet_information['vader_neg_cleaned'] = (vader_scores_clean)['neg']
-    tweet_information['vader_neu_cleaned'] = (vader_scores_clean)['neu']
-    tweet_information['vader_pos_cleaned'] = (vader_scores_clean)['pos']
-    tweet_information['vader_compund_cleaned'] = (vader_scores_clean)['compound']
+    tweet_information['vader_neg_cleaned'] = vader_scores_clean['neg']
+    tweet_information['vader_neu_cleaned'] = vader_scores_clean['neu']
+    tweet_information['vader_pos_cleaned'] = vader_scores_clean['pos']
+    tweet_information['vader_compund_cleaned'] = vader_scores_clean['compound']
 
     '''
     The second measure is Text Blob which measures the polarity and subjectivity
